@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mestre do Saber</title>
+<style>
+:root{--bg:#EAF0FA;--grid:#d3ddf0;--ink:#14213D;--card:#fff;--pink:#FF5C8A;--teal:#14A89B;--sun:#FFD23F;--bad:#E5484D;--ok:#14A89B;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101A33;--grid:#1a2748;--ink:#EAF0FA;--card:#1b2851;}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:'Trebuchet MS','Segoe UI',Roboto,sans-serif;font-size:17px}
+main{max-width:460px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:2.3rem;line-height:1;margin:8px 0 6px;font-weight:700;transform:rotate(-1.5deg)}
+h2{font-size:1.25rem;margin:22px 0 10px}
+p{margin:0 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;color:var(--ink);cursor:pointer;border:3px solid var(--ink);background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+button:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.lang button{flex:1;font-weight:600}
+.on{background:var(--sun)!important}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sub{font-weight:600;text-align:left;display:flex;gap:8px;align-items:center}
+.sub b{font-size:1.5rem}
+.mix{grid-column:1/-1;background:var(--pink);color:#fff;font-weight:700;justify-content:center}
+.bar{display:flex;justify-content:space-between;font-weight:600;margin-bottom:10px}
+.prog{height:12px;border:3px solid var(--ink);border-radius:8px;background:var(--card);overflow:hidden;margin-bottom:18px}
+.prog i{display:block;height:100%;background:var(--teal);transition:width .3s}
+.q{background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:20px;font-size:1.3rem;font-weight:600;margin-bottom:16px;box-shadow:0 5px 0 var(--ink)}
+.opts{display:grid;gap:10px}
+.opts button{text-align:left;font-weight:600}
+.opts .ok{background:var(--ok);color:#fff}
+.opts .no{background:var(--bad);color:#fff}
+.next{margin-top:16px;width:100%;background:var(--sun);font-weight:700}
+.big{font-size:4rem;font-weight:700;text-align:center;margin:10px 0;color:var(--pink)}
+.center{text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var T={
+pt:{t:"Mestre do Saber",s:"Aprende a jogar. Escolhe a língua e a disciplina.",l:"Língua",d:"Disciplina",mix:"Todas misturadas",q:"Pergunta",p:"Pontos",n:"Seguinte",f:"Ver resultado",r:"Resultado",a:"Jogar outra vez",h:"Menu",b:"Melhor",g:["Falhaste muitas! Tenta de novo.","Bom trabalho!","Excelente! És um mestre!"],sub:{m:"Matemática",f:"Física",q:"Química",h:"História",en:"Inglês",pt:"Português"}},
+en:{t:"Knowledge Master",s:"Learn by playing. Pick a language and a subject.",l:"Language",d:"Subject",mix:"Mix everything",q:"Question",p:"Points",n:"Next",f:"See result",r:"Result",a:"Play again",h:"Menu",b:"Best",g:["Many misses! Try again.","Good job!","Excellent! You’re a master!"],sub:{m:"Maths",f:"Physics",q:"Chemistry",h:"History",en:"English",pt:"Portuguese"}},
+es:{t:"Maestro del Saber",s:"Aprende jugando. Elige idioma y asignatura.",l:"Idioma",d:"Asignatura",mix:"Todo mezclado",q:"Pregunta",p:"Puntos",n:"Siguiente",f:"Ver resultado",r:"Resultado",a:"Jugar otra vez",h:"Menú",b:"Récord",g:["¡Muchos fallos! Inténtalo otra vez.","¡Buen trabajo!","¡Excelente! ¡Eres un maestro!"],sub:{m:"Matemáticas",f:"Física",q:"Química",h:"Historia",en:"Inglés",pt:"Portugués"}}
+};
+var ICON={m:"➗",f:"⚛️",q:"🧪",h:"🏛️",en:"🇬🇧",pt:"🇵🇹"};
+// each item: [question, correct, wrong, wrong]
+var D={
+m:{pt:[["Quanto é 7 × 8?","56","54","64"],["Qual é a raiz quadrada de 144?","12","14","11"],["Quanto é 15% de 200?","30","15","25"],["Quanto somam os ângulos de um triângulo?","180°","90°","360°"]],
+en:[["What is 7 × 8?","56","54","64"],["What is the square root of 144?","12","14","11"],["What is 15% of 200?","30","15","25"],["What do the angles of a triangle add up to?","180°","90°","360°"]],
+es:[["¿Cuánto es 7 × 8?","56","54","64"],["¿Cuál es la raíz cuadrada de 144?","12","14","11"],["¿Cuánto es el 15% de 200?","30","15","25"],["¿Cuánto suman los ángulos de un triángulo?","180°","90°","360°"]]},
+f:{pt:[["Qual é a unidade de força no SI?","Newton","Joule","Watt"],["Qual é a velocidade da luz, aproximadamente?","300 000 km/s","300 000 m/s","30 000 km/s"],["Quem formulou a lei da gravitação universal?","Newton","Einstein","Galileu"],["Qual é a aceleração da gravidade na Terra?","9,8 m/s²","98 m/s²","0,98 m/s²"]],
+en:[["What is the SI unit of force?","Newton","Joule","Watt"],["About how fast is the speed of light?","300,000 km/s","300,000 m/s","30,000 km/s"],["Who formulated the law of universal gravitation?","Newton","Einstein","Galileo"],["What is gravitational acceleration on Earth?","9.8 m/s²","98 m/s²","0.98 m/s²"]],
+es:[["¿Cuál es la unidad de fuerza en el SI?","Newton","Julio","Vatio"],["¿Cuál es aproximadamente la velocidad de la luz?","300 000 km/s","300 000 m/s","30 000 km/s"],["¿Quién formuló la ley de la gravitación universal?","Newton","Einstein","Galileo"],["¿Cuál es la aceleración de la gravedad en la Tierra?","9,8 m/s²","98 m/s²","0,98 m/s²"]]},
+q:{pt:[["Qual é a fórmula química da água?","H₂O","HO₂","H₂O₂"],["Qual é o símbolo químico do ouro?","Au","Ag","Go"],["Qual é o pH de uma solução neutra?","7","0","14"],["Qual é o gás mais abundante no ar?","Azoto","Oxigénio","Dióxido de carbono"]],
+en:[["What is the chemical formula of water?","H₂O","HO₂","H₂O₂"],["What is the chemical symbol for gold?","Au","Ag","Go"],["What is the pH of a neutral solution?","7","0","14"],["What is the most abundant gas in air?","Nitrogen","Oxygen","Carbon dioxide"]],
+es:[["¿Cuál es la fórmula química del agua?","H₂O","HO₂","H₂O₂"],["¿Cuál es el símbolo químico del oro?","Au","Ag","Go"],["¿Cuál es el pH de una solución neutra?","7","0","14"],["¿Cuál es el gas más abundante en el aire?","Nitrógeno","Oxígeno","Dióxido de carbono"]]},
+h:{pt:[["Em que ano Vasco da Gama chegou à Índia?","1498","1492","1500"],["Em que ano caiu o Muro de Berlim?","1989","1991","1985"],["Quem foi o primeiro presidente dos EUA?","George Washington","Abraham Lincoln","Thomas Jefferson"],["Em que ano começou a Revolução Francesa?","1789","1776","1804"]],
+en:[["In what year did Vasco da Gama reach India?","1498","1492","1500"],["In what year did the Berlin Wall fall?","1989","1991","1985"],["Who was the first US president?","George Washington","Abraham Lincoln","Thomas Jefferson"],["In what year did the French Revolution begin?","1789","1776","1804"]],
+es:[["¿En qué año llegó Vasco da Gama a la India?","1498","1492","1500"],["¿En qué año cayó el Muro de Berlín?","1989","1991","1985"],["¿Quién fue el primer presidente de EE. UU.?","George Washington","Abraham Lincoln","Thomas Jefferson"],["¿En qué año empezó la Revolución Francesa?","1789","1776","1804"]]},
+en:[["Choose the correct one: She ___ to school every day.","goes","go","going"],["What is the past tense of “buy”?","bought","buyed","boughted"],["What is the opposite of “cold”?","hot","slow","small"],["Which word is a synonym of “big”?","large","tiny","thin"]],
+pt:[["Qual é o plural de “cidadão”?","cidadãos","cidadões","cidadães"],["Qual é um sinónimo de “feliz”?","contente","triste","zangado"],["Qual frase está correta?","Havia muitas pessoas.","Haviam muitas pessoas.","Houveram muitas pessoas."],["Qual é o antónimo de “generoso”?","egoísta","bondoso","simpático"]]
+};
+var L="pt",S="mix",qs=[],i=0,score=0,streak=0,right=0,best=0,app=document.getElementById("app");
+try{best=+localStorage.getItem(bk())||0}catch(e){}
+function sh(a){a=a.slice();for(var j=a.length-1;j>0;j--){var k=Math.floor(Math.random()*(j+1)),x=a[j];a[j]=a[k];a[k]=x}return a}
+function pool(k){var d=D[k];return (k==="en"||k==="pt")?d:d[L]}
+function home(){var t=T[L],h="<h1>"+t.t+"</h1><p>"+t.s+"</p><h2>"+t.l+"</h2><div class='row lang'>";
+Object.keys(T).forEach(function(c){h+="<button data-l='"+c+"' class='"+(c===L?"on":"")+"'>"+c.toUpperCase()+"</button>"});
+h+="</div><h2>"+t.d+"</h2><div class='grid'>";
+Object.keys(t.sub).forEach(function(k){h+="<button class='sub' data-s='"+k+"'><b>"+ICON[k]+"</b>"+t.sub[k]+"</button>"});
+h+="<button class='sub mix' data-s='mix'>🎲 "+t.mix+"</button></div>";
+if(best)h+="<p class='center' style='margin-top:18px'>🏆 "+t.b+": "+best+"</p>";
+app.innerHTML=h;
+app.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){L=b.dataset.l;document.documentElement.lang=L;home()}});
+app.querySelectorAll("[data-s]").forEach(function(b){b.onclick=function(){start(b.dataset.s)}})}
+function start(k){S=k;var all=[];
+(k==="mix"?Object.keys(T[L].sub):[k]).forEach(function(c){pool(c).forEach(function(q){all.push(q)})});
+qs=sh(all).slice(0,k==="mix"?8:4);i=0;score=0;streak=0;right=0;ask()}
+function ask(){var t=T[L],q=qs[i],o=sh(q.slice(1)),h="<div class='bar'><span>"+t.q+" "+(i+1)+"/"+qs.length+"</span><span>⭐ "+score+(streak>1?" 🔥"+streak:"")+"</span></div><div class='prog'><i style='width:"+(i/qs.length*100)+"%'></i></div><div class='q'>"+q[0]+"</div><div class='opts'>";
+o.forEach(function(x){h+="<button>"+x+"</button>"});
+app.innerHTML=h+"</div><div id='nx'></div>";
+app.querySelectorAll(".opts button").forEach(function(b){b.onclick=function(){pick(b,q[1])}})}
+function pick(b,c){var t=T[L],bs=app.querySelectorAll(".opts button");
+bs.forEach(function(x){x.disabled=true;if(x.textContent===c)x.className="ok"});
+if(b.textContent===c){streak++;right++;score+=10+5*Math.min(streak-1,4)}else{streak=0;b.className="no"}
+var last=i===qs.length-1;
+document.getElementById("nx").innerHTML="<button class='next'>"+(last?t.f:t.n)+"</button>";
+document.querySelector(".next").onclick=function(){i++;last?end():ask()}}
+function end(){var t=T[L],r=right/qs.length,g=r<.5?0:r<1?1:2;
+if(score>best){best=score;try{localStorage.setItem(bk(),best)}catch(e){}}
+app.innerHTML="<h1 class='center'>"+t.r+"</h1><div class='big'>"+score+"</div><p class='center'>"+right+"/"+qs.length+" ✔</p><p class='center' style='font-size:1.3rem;font-weight:600'>"+t.g[g]+"</p><p class='center'>🏆 "+t.b+": "+best+"</p><button class='next' id='again'>"+t.a+"</button><button class='next' id='menu' style='background:var(--card)'>"+t.h+"</button>";
+document.getElementById("again").onclick=function(){start(S)};
+document.getElementById("menu").onclick=home}
+T.fr={t:"Maître du Savoir",s:"Apprends en jouant. Choisis une langue et une matière.",l:"Langue",d:"Matière",mix:"Tout mélangé",q:"Question",p:"Points",n:"Suivant",f:"Voir le résultat",r:"Résultat",a:"Rejouer",h:"Menu",b:"Record",g:["Beaucoup d’erreurs ! Réessaie.","Bon travail !","Excellent ! Tu es un maître !"],sub:{m:"Maths",f:"Physique",q:"Chimie",h:"Histoire",en:"Anglais",pt:"Portugais"}};
+var N={pt:["Geografia","Biologia","Quebra-cabeças","🔢 Sequências","🔀 Palavras baralhadas","🧠 Memória","Junta cada símbolo ao número atómico."],en:["Geography","Biology","Puzzles","🔢 Sequences","🔀 Word scramble","🧠 Memory","Match each symbol with its atomic number."],es:["Geografía","Biología","Rompecabezas","🔢 Secuencias","🔀 Palabras desordenadas","🧠 Memoria","Une cada símbolo con su número atómico."],fr:["Géographie","Biologie","Casse-têtes","🔢 Suites","🔀 Mots mélangés","🧠 Mémoire","Associe chaque symbole à son numéro atomique."]};
+Object.keys(N).forEach(function(c){var n=N[c];T[c].sub.g=n[0];T[c].sub.b=n[1];T[c].pz=n[2];T[c].z1=n[3];T[c].z2=n[4];T[c].z3=n[5];T[c].hint=n[6]});
+ICON.g="🌍";ICON.b="🧬";
+D.m.fr=[["Combien font 7 × 8 ?","56","54","64"],["Quelle est la racine carrée de 144 ?","12","14","11"],["Combien font 15 % de 200 ?","30","15","25"],["Quelle est la somme des angles d’un triangle ?","180°","90°","360°"]];
+D.f.fr=[["Quelle est l’unité de force du SI ?","Newton","Joule","Watt"],["Quelle est la vitesse de la lumière, environ ?","300 000 km/s","300 000 m/s","30 000 km/s"],["Qui a formulé la loi de la gravitation universelle ?","Newton","Einstein","Galilée"],["Quelle est l’accélération de la pesanteur sur Terre ?","9,8 m/s²","98 m/s²","0,98 m/s²"]];
+D.q.fr=[["Quelle est la formule chimique de l’eau ?","H₂O","HO₂","H₂O₂"],["Quel est le symbole chimique de l’or ?","Au","Ag","Go"],["Quel est le pH d’une solution neutre ?","7","0","14"],["Quel est le gaz le plus abondant dans l’air ?","Azote","Oxygène","Dioxyde de carbone"]];
+D.h.fr=[["En quelle année Vasco de Gama est-il arrivé en Inde ?","1498","1492","1500"],["En quelle année le mur de Berlin est-il tombé ?","1989","1991","1985"],["Qui fut le premier président des États-Unis ?","George Washington","Abraham Lincoln","Thomas Jefferson"],["En quelle année a commencé la Révolution française ?","1789","1776","1804"]];
+D.g={pt:[["Qual é a capital da Austrália?","Camberra","Sydney","Melbourne"],["Qual é o maior oceano?","Pacífico","Atlântico","Índico"],["Qual é o rio mais extenso da Península Ibérica?","Tejo","Douro","Ebro"],["Em que continente fica o Egito?","África","Ásia","Europa"]],
+en:[["What is the capital of Australia?","Canberra","Sydney","Melbourne"],["What is the largest ocean?","Pacific","Atlantic","Indian"],["Which is the longest river of the Iberian Peninsula?","Tagus","Douro","Ebro"],["On which continent is Egypt?","Africa","Asia","Europe"]],
+es:[["¿Cuál es la capital de Australia?","Canberra","Sídney","Melbourne"],["¿Cuál es el océano más grande?","Pacífico","Atlántico","Índico"],["¿Cuál es el río más largo de la península ibérica?","Tajo","Duero","Ebro"],["¿En qué continente está Egipto?","África","Asia","Europa"]],
+fr:[["Quelle est la capitale de l’Australie ?","Canberra","Sydney","Melbourne"],["Quel est le plus grand océan ?","Pacifique","Atlantique","Indien"],["Quel est le plus long fleuve de la péninsule Ibérique ?","Tage","Douro","Èbre"],["Sur quel continent se trouve l’Égypte ?","Afrique","Asie","Europe"]]};
+D.b={pt:[["Que organelo produz energia na célula?","Mitocôndria","Ribossoma","Núcleo"],["Que gás absorvem as plantas na fotossíntese?","Dióxido de carbono","Oxigénio","Azoto"],["Quantos cromossomas tem uma célula humana?","46","23","48"],["Qual é o maior órgão do corpo humano?","Pele","Fígado","Pulmão"]],
+en:[["Which organelle produces energy in the cell?","Mitochondria","Ribosome","Nucleus"],["Which gas do plants absorb in photosynthesis?","Carbon dioxide","Oxygen","Nitrogen"],["How many chromosomes does a human cell have?","46","23","48"],["What is the largest organ of the human body?","Skin","Liver","Lung"]],
+es:[["¿Qué orgánulo produce energía en la célula?","Mitocondria","Ribosoma","Núcleo"],["¿Qué gas absorben las plantas en la fotosíntesis?","Dióxido de carbono","Oxígeno","Nitrógeno"],["¿Cuántos cromosomas tiene una célula humana?","46","23","48"],["¿Cuál es el órgano más grande del cuerpo humano?","Piel","Hígado","Pulmón"]],
+fr:[["Quel organite produit l’énergie de la cellule ?","Mitochondrie","Ribosome","Noyau"],["Quel gaz les plantes absorbent-elles lors de la photosynthèse ?","Dioxyde de carbone","Oxygène","Azote"],["Combien de chromosomes a une cellule humaine ?","46","23","48"],["Quel est le plus grand organe du corps humain ?","La peau","Le foie","Le poumon"]]};
+var W={pt:["átomo","energia","planeta","fração","célula","oceano"],en:["atom","energy","planet","fraction","cell","ocean"],es:["átomo","energía","planeta","fracción","célula","océano"],fr:["atome","énergie","planète","fraction","cellule","océan"]};
+function seq(){var out=[];for(var n=0;n<5;n++){var a=1+Math.floor(Math.random()*9),d=2+Math.floor(Math.random()*7),k=n%3,s=[];
+for(var j=0;j<5;j++)s.push(k===0?a+d*j:k===1?a*Math.pow(2,j):(j+a)*(j+a));
+out.push([s.slice(0,4).join(", ")+", ?",String(s[4]),String(s[4]+2),String(s[4]-3)])}return sh(out)}
+function scr(){return sh(W[L]).slice(0,5).map(function(w){var ch=w.split(""),z,o=[w],g=0;do{z=sh(ch).join("")}while(z===w);
+while(o.length<3&&g++<60){var a=ch.slice(),p=Math.floor(Math.random()*a.length),q=Math.floor(Math.random()*a.length),x=a[p];a[p]=a[q];a[q]=x;var v=a.join("");if(o.indexOf(v)<0)o.push(v)}
+return ["🔀 "+z.toUpperCase()].concat(o)})}
+function mem(){var P=[["H","1"],["He","2"],["C","6"],["O","8"],["Na","11"],["Fe","26"]],c=[],t=T[L],open=[],moves=0,done=0,lock=false;
+P.forEach(function(p,k){c.push([p[0],k]);c.push([p[1],k])});c=sh(c);
+app.innerHTML="<div class='bar'><span>"+t.z3+"</span><span id='mv'>0</span></div><p>"+t.hint+"</p><div class='grid mg'>"+c.map(function(x,n){return "<button class='card' data-n='"+n+"'>?</button>"}).join("")+"</div>";
+app.querySelectorAll(".card").forEach(function(b){b.onclick=function(){
+if(lock||open.length>1||b.classList.contains("ok")||open.indexOf(b)>-1)return;
+b.textContent=c[b.dataset.n][0];b.classList.add("on");open.push(b);if(open.length<2)return;
+moves++;document.getElementById("mv").textContent=moves;var a=open[0],d=open[1];
+if(c[a.dataset.n][1]===c[d.dataset.n][1]){a.className=d.className="card ok";open=[];if(++done===6)fin()}
+else{lock=true;setTimeout(function(){[a,d].forEach(function(x){x.className="card";x.textContent="?"});open=[];lock=false},800)}}});
+function fin(){score=Math.max(10,100-(moves-6)*8);if(score>best){best=score;try{localStorage.setItem(bk(),best)}catch(e){}}
+app.innerHTML="<h1 class='center'>"+t.r+"</h1><div class='big'>"+score+"</div><p class='center'>"+moves+" ✔</p><p class='center'>🏆 "+t.b+": "+best+"</p><button class='next' id='again'>"+t.a+"</button><button class='next' id='menu' style='background:var(--card)'>"+t.h+"</button>";
+document.getElementById("again").onclick=mem;document.getElementById("menu").onclick=home}}
+var _st=start;start=function(k){if(k==="z1"||k==="z2"){S=k;qs=k==="z1"?seq():scr();i=0;score=0;streak=0;right=0;ask()}else if(k==="z3"){S=k;mem()}else _st(k)};
+var _hm=home;home=function(){_hm();var t=T[L];
+app.querySelector(".grid").insertAdjacentHTML("afterend","<h2>"+t.pz+"</h2><div class='grid'><button class='sub' data-z='z1'>"+t.z1+"</button><button class='sub' data-z='z2'>"+t.z2+"</button><button class='sub mix' data-z='z3' style='background:var(--teal)'>"+t.z3+"</button></div>");
+app.querySelectorAll("[data-z]").forEach(function(b){b.onclick=function(){start(b.dataset.z)}})};
+var st=document.createElement("style");st.textContent=".lang button{padding:12px 4px}.mg{grid-template-columns:repeat(3,1fr)}.card{height:76px;font-size:1.5rem;font-weight:700;text-align:center;padding:4px}.card.ok{background:var(--ok);color:#fff}";document.head.appendChild(st);
+function bk(){return "msBest"+(U?U.n:"")}
+var U=null,pa=-1,nmv="";
+try{var _u=JSON.parse(localStorage.getItem("msUser"));if(_u&&typeof _u.n==="string"&&_u.a>=0&&_u.a<=2)U=_u}catch(e){}
+var UT={pt:{hi:"Olá",nm:"O teu nome",ag:"A tua idade",go:"Começar",sw:"Trocar jogador",k1:"🔢 Números",k2:"🔤 Letras",k3:"🐶 Palavras",k4:"🎈 Contar",k5:"🖼️ Qual é?"},
+en:{hi:"Hello",nm:"Your name",ag:"Your age",go:"Start",sw:"Switch player",k1:"🔢 Numbers",k2:"🔤 Letters",k3:"🐶 Words",k4:"🎈 Count",k5:"🖼️ What is it?"},
+es:{hi:"Hola",nm:"Tu nombre",ag:"Tu edad",go:"Empezar",sw:"Cambiar jugador",k1:"🔢 Números",k2:"🔤 Letras",k3:"🐶 Palabras",k4:"🎈 Contar",k5:"🖼️ ¿Qué es?"},
+fr:{hi:"Bonjour",nm:"Ton prénom",ag:"Ton âge",go:"Commencer",sw:"Changer de joueur",k1:"🔢 Nombres",k2:"🔤 Lettres",k3:"🐶 Mots",k4:"🎈 Compter",k5:"🖼️ C’est quoi ?"}};
+Object.keys(UT).forEach(function(c){T[c].u=UT[c]});
+var NUM={pt:["um","dois","três","quatro","cinco","seis","sete","oito","nove","dez"],en:["one","two","three","four","five","six","seven","eight","nine","ten"],es:["uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez"],fr:["un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix"]};
+var WD=[["🐶","cão","dog","perro","chien"],["🐱","gato","cat","gato","chat"],["🍎","maçã","apple","manzana","pomme"],["🚗","carro","car","coche","voiture"],["☀️","sol","sun","sol","soleil"],["🌳","árvore","tree","árbol","arbre"],["🏠","casa","house","casa","maison"],["🐟","peixe","fish","pez","poisson"],["⭐","estrela","star","estrella","étoile"],["📖","livro","book","libro","livre"]];
+var LI={pt:1,en:2,es:3,fr:4},VO={pt:"pt-PT",en:"en-US",es:"es-ES",fr:"fr-FR"};
+function say(x){try{var u=new SpeechSynthesisUtterance(x);u.lang=VO[L];u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function clean(){return document.getElementById("nm").value.replace(/[<>"'&]/g,"").trim()}
+function login(){var t=T[L],u=t.u,h="<h1>"+t.t+"</h1><div class='row lang'>";
+Object.keys(T).forEach(function(c){h+="<button data-l='"+c+"' class='"+(c===L?"on":"")+"'>"+c.toUpperCase()+"</button>"});
+h+="</div><h2>"+u.nm+"</h2><input id='nm' maxlength='20' value='"+nmv+"'><h2>"+u.ag+"</h2><div class='row lang'>";
+["4–7","8–12","13+"].forEach(function(x,k){h+="<button data-a='"+k+"' class='"+(k===pa?"on":"")+"'>"+x+"</button>"});
+app.innerHTML=h+"</div><button class='next' id='go'>"+u.go+"</button>";
+app.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){nmv=clean();L=b.dataset.l;document.documentElement.lang=L;login()}});
+app.querySelectorAll("[data-a]").forEach(function(b){b.onclick=function(){nmv=clean();pa=+b.dataset.a;login()}});
+document.getElementById("go").onclick=function(){nmv=clean();if(!nmv){document.getElementById("nm").focus();return}if(pa<0)return;
+U={n:nmv,a:pa,l:L};try{localStorage.setItem("msUser",JSON.stringify(U))}catch(e){}
+best=0;try{best=+localStorage.getItem(bk())||0}catch(e){}home()}}
+function logout(){U=null;pa=-1;nmv="";try{localStorage.removeItem("msUser")}catch(e){}best=0;login()}
+function kidHome(){var t=T[L],u=t.u,h="<h1>"+u.hi+", "+U.n+"! 👋</h1><div class='row lang'>";
+Object.keys(T).forEach(function(c){h+="<button data-l='"+c+"' class='"+(c===L?"on":"")+"'>"+c.toUpperCase()+"</button>"});
+h+="</div><div class='grid' style='margin-top:16px'>";
+["k1","k2","k3","k4","k5"].forEach(function(k){h+="<button class='sub kb"+(k==="k5"?" mix":"")+"' data-k='"+k+"'>"+u[k]+"</button>"});
+app.innerHTML=h+"</div><button class='next' id='sw' style='background:var(--card)'>"+u.sw+"</button>";
+app.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){L=b.dataset.l;document.documentElement.lang=L;kidHome()}});
+app.querySelectorAll("[data-k]").forEach(function(b){b.onclick=function(){var k=b.dataset.k;k==="k4"||k==="k5"?start(k):learn(k,0)}});
+document.getElementById("sw").onclick=logout}
+function LB(k){if(k==="k1")return NUM[L].map(function(w,j){return [j+1,"🍎".repeat(j+1),w]});
+if(k==="k2")return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(function(c){return [c+" "+c.toLowerCase(),"",c]});
+return WD.map(function(w){return [w[0],"",w[LI[L]]]})}
+function learn(k,n){var it=LB(k);n=(n+it.length)%it.length;var x=it[n],t=T[L];
+app.innerHTML="<div class='q center'><div class='big' style='color:var(--ink)'>"+x[0]+"</div><div style='font-size:1.8rem'>"+x[1]+"</div><div style='font-size:1.6rem;font-weight:700'>"+x[2]+"</div></div><div class='row lang'><button id='pv'>⬅️</button><button id='sp'>🔊</button><button id='nx2'>➡️</button></div><button class='next' id='bk' style='background:var(--card)'>"+t.h+"</button>";
+var sp=function(){say(x[2])};
+document.getElementById("pv").onclick=function(){learn(k,n-1)};document.getElementById("nx2").onclick=function(){learn(k,n+1)};
+document.getElementById("sp").onclick=sp;document.getElementById("bk").onclick=home;sp()}
+function kgame(k){S=k;i=0;score=0;streak=0;right=0;
+if(k==="k4"){var E=["🍎","🐟","⭐","🎈","🐶"];qs=sh([1,2,3,4,5,6,7,8,9,10]).slice(0,6).map(function(n){var e=E[Math.floor(Math.random()*5)],w=[n-1,n+1,n+2,n-2].filter(function(x){return x>=1&&x<=10&&x!==n}).slice(0,2);return [e.repeat(n),String(n),String(w[0]),String(w[1])]})}
+else{qs=sh(WD).slice(0,6).map(function(w){var o=sh(WD.filter(function(x){return x!==w})).slice(0,2);return [w[0],w[LI[L]],o[0][LI[L]],o[1][LI[L]]]})}
+ask()}
+function mgen(n){var o=[],e=U&&U.a===2;for(var j=0;j<n;j++){var a=2+Math.floor(Math.random()*(e?13:9)),b=2+Math.floor(Math.random()*(e?13:9)),r=j%3,q,c;
+if(r===0){q=a+" × "+b;c=a*b}else if(r===1){q=(a*b)+" ÷ "+a;c=b}else if(e){q="("+a+" + "+b+") × 2";c=(a+b)*2}else{q=a+" + "+b;c=a+b}
+o.push([q+" = ?",String(c),String(c+2),String(c-3)])}return o}
+var _s2=start;start=function(k){if(k==="k4"||k==="k5")return kgame(k);_s2(k);
+if(k==="m"){qs=sh(pool("m").concat(mgen(6)));i=0;ask()}
+else if(k==="mix"){var a=[];Object.keys(T[L].sub).forEach(function(c){pool(c).forEach(function(q){a.push(q)})});qs=sh(a.concat(mgen(2))).slice(0,10);i=0;ask()}};
+var _ak=ask;ask=function(){_ak();var q=document.querySelector(".q"),tx=q.textContent.replace(/[^\p{L}\p{N}\s?,.%×÷+=]/gu,"").trim();
+if(U&&U.a===0)q.style.fontSize="2.2rem";
+if(tx){q.insertAdjacentHTML("beforeend"," <button id='sq' style='padding:4px 10px;margin-left:6px'>🔊</button>");document.getElementById("sq").onclick=function(){say(tx)};if(U&&U.a===0)say(tx)}};
+var _pk=pick;pick=function(b,c){_pk(b,c);if(U&&U.a===0)say(c)};
+var _h2=home;home=function(){if(!U)return login();if(U.a===0)return kidHome();_h2();var u=T[L].u;
+app.insertAdjacentHTML("afterbegin","<p>"+u.hi+", <b>"+U.n+"</b>! <a href='#' id='sw'>"+u.sw+"</a></p>");
+document.getElementById("sw").onclick=function(e){e.preventDefault();logout()}};
+var st2=document.createElement("style");st2.textContent="input{font:inherit;width:100%;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:14px;padding:12px}.kb{min-height:96px;font-size:1.3rem;justify-content:center}a{color:var(--pink)}";document.head.appendChild(st2);
+if(U){L=U.l||L;document.documentElement.lang=L;try{best=+localStorage.getItem(bk())||0}catch(e){}}
+home();
+</script>
+</body>
+</html>
